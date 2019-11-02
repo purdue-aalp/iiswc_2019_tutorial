@@ -19,6 +19,7 @@ RUN apt-get update -y && apt-get install -y \
     zlib1g-dev \
     git \
     vim \
+    gdb \
     libxml2
 
 # Change symlinks to point to GCC 5.
@@ -26,8 +27,8 @@ RUN rm /usr/bin/gcc && ln -s /usr/bin/gcc-5 /usr/bin/gcc
 RUN rm /usr/bin/g++ && ln -s /usr/bin/g++-5 /usr/bin/g++
 
 # Clone the tutorial files
-RUN git clone https://github.com/purdue-aalp/gpgpu-sim_distribution.git
-RUN git clone https://github.com/purdue-aalp/iiswc_2019_tutorial.git
+RUN git clone https://github.com/purdue-aalp/gpgpu-sim_distribution.git /root/gpgpu-sim_distribution
+RUN git clone https://github.com/purdue-aalp/iiswc_2019_tutorial.git /root/iiswc_2019_tutorial
 
 # Download CUDA Toolkit version 10.1.
 RUN wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
@@ -36,31 +37,17 @@ RUN wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_insta
 # We only need the toolkit
 RUN sh cuda_10.1.243_418.87.00_linux.run --silent --toolkit
 
-# Download GPU Computing SDK version 3.2.16.
-RUN wget http://developer.download.nvidia.com/compute/cuda/3_2_prod/sdk/gpucomputingsdk_3.2.16_linux.run
-
-# Install the GPU Computing SDK toolkit.
-RUN bash gpucomputingsdk_3.2.16_linux.run
-
-RUN mv /root/NVIDIA_GPU_Computing_SDK/C /usr/local/cuda && \
-    mv /root/NVIDIA_GPU_Computing_SDK/shared /usr/local/cuda
-
 # Place the environment setup lines in a file
 RUN echo " \
-    export CUDAHOME=/usr/local/cuda; \
-    export PATH=$PATH:/usr/local/cuda/bin; \
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/lib; \
-    export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/C/lib:/usr/local/cuda/shared/lib; \
-    export CUDA_INSTALL_PATH=/usr/local/cuda; \
-    export NVIDIA_COMPUTE_SDK_LOCATION=/usr/local/cuda; \
+    export CUDAHOME=/usr/local/cuda-10.1; \
+    export PATH=$PATH:/usr/local/cuda-10.1/bin; \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/lib64:/usr/local/cuda-10.1/lib; \
+    export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda-10.1/C/lib:/usr/local/cuda-10.1/shared/lib; \
+    export CUDA_INSTALL_PATH=/usr/local/cuda-10.1; \
+    export NVIDIA_COMPUTE_SDK_LOCATION=/usr/local/cuda-10.1; \
     " >> /root/env
 
 # Source this in the .bashrc file
 RUN echo "source /root/env" >> /root/.bashrc
-
-WORKDIR /usr/local/cuda/C/common
-RUN make 2> /dev/null
-WORKDIR /usr/local/cuda/shared
-RUN make 2> /dev/null
 
 WORKDIR /
