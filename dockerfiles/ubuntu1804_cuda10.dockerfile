@@ -25,6 +25,10 @@ RUN apt-get update -y && apt-get install -y \
 RUN rm /usr/bin/gcc && ln -s /usr/bin/gcc-5 /usr/bin/gcc
 RUN rm /usr/bin/g++ && ln -s /usr/bin/g++-5 /usr/bin/g++
 
+# Clone the tutorial files
+RUN git clone https://github.com/purdue-aalp/gpgpu-sim_distribution.git
+RUN git clone https://github.com/purdue-aalp/iiswc_2019_tutorial.git
+
 # Download CUDA Toolkit version 10.1.
 RUN wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
 
